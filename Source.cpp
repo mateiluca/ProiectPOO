@@ -1,9 +1,19 @@
 #include <iostream>
 #include <string>
+#include "Classes.h"
 
 using namespace std;
 
 string coms[200] = { "CREATE TABLE","DROP TABLE","DISPLAY TABLE", "INSERT INTO", "DELETE FROM", "SELECT", "UPDATE"};
+
+string DeleteWSpace(string a)
+{
+	while (a[0] == ' ')
+	{
+		a = a.substr(1);
+	}
+	return a;
+}
 
 void CreateTable(string p)
 {
@@ -31,6 +41,8 @@ void CreateTable(string p)
 	}
 	aux = p.substr(tName.length());
 	
+
+	cout << tName << endl;
 	toW = false;
 	isW = false;
 	toO = true;
@@ -159,7 +171,7 @@ void CreateTable(string p)
 
 	if (toEnd)
 	{
-		cout << "-FUNCTIE CREARE TABEL: " << tName;
+		cout << "-FUNCTIE CREARE TABEL-";
 	}
 	else
 	{
@@ -176,6 +188,7 @@ void CreateTable(string p)
 void DropTable(string p)
 {
 	string tName;
+	p = DeleteWSpace(p);
 	tName = p.substr(0, p.find(' '));
 	cout << "-Functie Drop Table: " << tName;
 }
@@ -183,6 +196,7 @@ void DropTable(string p)
 void DisplayTable(string p)
 {
 	string tName;
+	p = DeleteWSpace(p);
 	tName = p.substr(0, p.find(' '));
 	cout << "-Functie Display Table: " << tName;
 }
@@ -196,8 +210,11 @@ void InsertInto(string p)
 	//     Open ( || Close ) || Word || Next , || End ; 
 	bool toO, toC, toW, isW, toN, toEnd;
 
+	p = DeleteWSpace(p);
 	tName = p.substr(0, p.find(' '));
 	aux = p.substr(tName.length() + 1);
+	aux = DeleteWSpace(aux);
+
 	if (aux.find("VALUES", 0) != 0)
 	{
 		cout << "Parametrii nu au fost introdusi corect";
@@ -349,17 +366,165 @@ void InsertInto(string p)
 
 void DeleteFrom(string p)
 {
-	cout << 4;
+	string aux, tName, cName, val;
+
+	p = DeleteWSpace(p);
+	tName = p.substr(0, p.find(' '));
+	aux = p.substr(tName.length() + 1);
+	aux = DeleteWSpace(aux);
+
+	if (aux.find("WHERE", 0) != 0)
+	{
+		cout << "Parametrii nu au fost introdusi corect";
+		return;
+	}
+	aux = aux.substr(aux.rfind("WHERE", 0) + 5);
+	aux = DeleteWSpace(aux);
+
+	cName = aux.substr(0, aux.find(' '));
+
+	aux = aux.substr(cName.length());
+	aux = DeleteWSpace(aux);
+
+	if (aux[0] != '=')
+	{
+		cout << "Parametrii nu au fost introdusi corect";
+		return;
+	}
+	aux = aux.substr(1);
+	aux = DeleteWSpace(aux);
+
+	val = aux.substr(0, aux.find(' '));
+
+	cout << "-FUNCTIE DELETE-";
 }
 
 void Select(string p)
 {
-	cout << 5;
+	string* col = new string[sizeof(string)];
+	string aux, tName;
+	int nCol = 0;
+
+	p = DeleteWSpace(p);
+	if (p.rfind("ALL FROM", 0) == 0)
+	{
+		aux = p.substr(8);
+		aux = DeleteWSpace(aux);
+
+		if (aux.length() == 0)
+		{
+			cout << "Nu exista nume";
+			return;
+		}
+		tName = aux.substr(0, aux.find(' '));
+
+		cout << "FUNCTIE SELECT LA TOT";
+	}
+	else
+	{
+		if (p.find("FROM") == string::npos || p.find("FROM") == 0)
+		{
+			cout << "FUNCTIA NU A FOST INTRODUSA BINE";
+			return;
+		}
+		else
+		{
+			aux = p;
+			while (aux.rfind("FROM", 0) != 0)
+			{
+				col[nCol] = aux.substr(0, aux.find_first_of(" ,"));
+				aux = aux.substr(col[nCol].length() + 1);
+				aux = DeleteWSpace(aux);
+				nCol++;
+			}
+			if (aux.length() > 4)
+			{
+				aux = aux.substr(4);
+				aux = DeleteWSpace(aux);
+
+				if (aux.length() == 0)
+				{
+					cout << "Nu exista nume";
+					return;
+				}
+
+				tName = aux.substr(0, aux.find(" "));
+
+				cout << "FUNCTIE SELECT DIN " << tName;
+			}
+			else
+			{
+				cout << "FUNCTIA NU A FOST INTRODUSA BINE";
+			}
+		}
+	}
 }
 
 void Update(string p)
 {
-	cout << 6;
+	string aux, tName, cNameM, valM, cNameF, valF;
+
+	p = DeleteWSpace(p);
+	tName = p.substr(0, p.find(' '));
+	aux = p.substr(tName.length() + 1);
+	aux = DeleteWSpace(aux);
+
+	if (aux.find("SET", 0) != 0)
+	{
+		cout << "Parametrii nu au fost introdusi corect";
+		return;
+	}
+	aux = aux.substr(aux.rfind("SET", 0) + 3);
+	aux = DeleteWSpace(aux);
+
+	cNameM = aux.substr(0, aux.find(' '));
+
+	aux = aux.substr(cNameM.length());
+	aux = DeleteWSpace(aux);
+
+	if (aux[0] != '=')
+	{
+		cout << "Parametrii nu au fost introdusi corect";
+		return;
+	}
+	aux = aux.substr(1);
+	aux = DeleteWSpace(aux);
+
+	valM = aux.substr(0, aux.find(' '));
+
+	aux = p.substr(valM.length());
+	aux = DeleteWSpace(aux);
+
+	if (aux.find("WHERE", 0) != 0)
+	{
+		cout << "Parametrii nu au fost introdusi corect";
+		return;
+	}
+	aux = aux.substr(aux.rfind("WHERE", 0) + 5);
+	aux = DeleteWSpace(aux);
+
+	cNameF = aux.substr(0, aux.find(' '));
+
+	aux = aux.substr(cNameF.length());
+	aux = DeleteWSpace(aux);
+
+	if (aux[0] != '=')
+	{
+		cout << "Parametrii nu au fost introdusi corect";
+		return;
+	}
+	aux = aux.substr(1);
+	aux = DeleteWSpace(aux);
+
+	if (aux.length() == 0)
+	{
+		cout << "Parametrii nu au fost introdusi corect";
+		return;
+	}
+
+	valF = aux.substr(0, aux.find(' '));
+
+	cout << "-FUNCTIE DELETE-";
 }
 
 int main()
